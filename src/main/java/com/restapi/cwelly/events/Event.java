@@ -1,13 +1,14 @@
 package com.restapi.cwelly.events;
 
-import lombok.Builder;
+import lombok.*;
 
 import java.time.LocalDateTime;
 // 자바 빈 스펙에 맞는 형태
 // 1. 기본 생성자 존재
 // 2. 필드 내에서 게터세터가 있어야함
 // 이를 롬복으로 구현
-@Builder
+@Builder @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @EqualsAndHashCode(of="id")
 public class Event {
     private Integer id;
     private String name;

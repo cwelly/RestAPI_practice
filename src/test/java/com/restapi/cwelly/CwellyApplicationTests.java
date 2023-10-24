@@ -19,6 +19,14 @@ class CwellyApplicationTests {
 				.build();
 		//assertJ 가 제공하는 라이브러리 임포트
 		assertThat(event).isNotNull();
+	}
+	@Test
+	public void javaBean(){
+		Event event = new Event();
+		String name = "Event";
+		event.setName(name);
+		event.setDescription("Spring");
+		assertThat(event.getName()).isEqualTo(name);
 
 	}
 
