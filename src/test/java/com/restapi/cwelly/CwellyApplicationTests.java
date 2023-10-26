@@ -22,11 +22,27 @@ class CwellyApplicationTests {
 	}
 	@Test
 	public void javaBean(){
-		Event event = new Event();
+		// Given
 		String name = "Event";
+		String description = "Spring";
+
+		// When
+		Event event = new Event();
 		event.setName(name);
-		event.setDescription("Spring");
+		event.setDescription(description);
+
+		// 여기서 단축키 꿀팁
+		// 아래와 같이 "something"을 중복해서 사용하는경우
+		// 이를 변수화 해주고 , 선언까지 해주는 단축키
+		// 바로 커서로 범위 지정해주고 , ctrl + alt + v 해주면 끝
+
+		// 여기서 단축키 꿀팁
+		// 해당 테스트를 바로실행하려면 ctrl + shift + F10
+
+
+		// Then
 		assertThat(event.getName()).isEqualTo(name);
+		assertThat(event.getDescription()).isEqualTo(description);
 
 	}
 
