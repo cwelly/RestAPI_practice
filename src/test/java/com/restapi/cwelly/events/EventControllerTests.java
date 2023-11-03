@@ -30,7 +30,7 @@ public class EventControllerTests {
     @Autowired
     MockMvc mockMvc;
     // 이 MockMvc는 웹서버를 띄우지 않아서 조금 빠르지만,
-    // 그자체로 DS이기 때문에 단위테스트보단 느리다
+    // 그자체로 DS이기 때문에 단위테스트보단 느리다 !
 
     @Test
     public void createEvent() throws Exception {
