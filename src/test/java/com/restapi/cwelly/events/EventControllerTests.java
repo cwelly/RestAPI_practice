@@ -1,17 +1,23 @@
 package com.restapi.cwelly.events;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.web.JsonPath;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -32,14 +38,39 @@ public class EventControllerTests {
     // 이 MockMvc는 웹서버를 띄우지 않아서 조금 빠르지만,
     // 그자체로 DS이기 때문에 단위테스트보단 느리다 !
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Test
     public void createEvent() throws Exception {
+        Event event = Event.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,22))
+                .beginEventDateTime(LocalDateTime.of(2018,11,25,14,21))
+                .endEventDateTime(LocalDateTime.of(2018,11,26,14,21))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+        //이런 요청을 줘야하는데 본문에 주는 방법은
+        // 아래에서 Json으로 바꿔주기로 했다
+        
         // perform 안에 있는 매개인자는 내가 확인하고 싶은 요청 넣으면 됨
         mockMvc.perform(post("/api/events/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaTypes.HAL_JSON)
+                // parameter로 줄 event 클래스를 Json형식으로 변환시키는 메소드
+                        .content(objectMapper.writeValueAsString(event))
                 )
-                .andExpect(status().isCreated());
+                // 이렇게 하면 실행결과를 찍어보기가능
+                .andDo(print())
+                // 이렇게 하면 실행결과를 찍어보기가능
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists());
+
     }
 
 
