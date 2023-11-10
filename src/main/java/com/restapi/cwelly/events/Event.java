@@ -1,6 +1,11 @@
 package com.restapi.cwelly.events;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
 
 // 자세한 구현 코드들은
@@ -12,6 +17,7 @@ import java.time.LocalDateTime;
 // 이를 롬복으로 구현
 @Builder @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter @EqualsAndHashCode(of="id")
+@Entity
 // @EqualsAndHashCode(of="id")
 // 모든 필드를 사용하지만 , 나중에 엔티티간의 연관관계가 있을때 ,
 // Equals 와 Hashcode가 있는 곳에서 상호참조때문에 스택오버플로우가 발생하는것을
@@ -23,6 +29,8 @@ import java.time.LocalDateTime;
 
 // 여기서 @Data  사용하면 안되는 이유는, 이미 Data와 겹치는 애노테이션읋 적용해뒀기 때문
 public class Event {
+    @Id
+    @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -36,5 +44,9 @@ public class Event {
     private int limitOfEnrollment;
     private boolean offline ;
     private boolean free;
+    // EnumType에는 ordinal 과 String이 있는데,
+    // 순서를 우선시하는 ordinal은 나중에 enum의 순서가 바뀌면 데이터가
+    // 꼬일 위험을 피하고자 String 사용
+    @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 }
