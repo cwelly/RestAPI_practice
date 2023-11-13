@@ -19,7 +19,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class EventController {
 
     private final EventRepository eventRepository;
-
+    //A
     // 받아올 파라미터가 이미 빈에 등록되어있다면 @Autowired생략 가능
     public EventController(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
