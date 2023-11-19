@@ -4,8 +4,10 @@ package com.restapi.cwelly.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.JsonPath;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -41,6 +43,11 @@ public class EventControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    //위의 WebMvcTest만으로는 Repository 를 빈에 등록해주지 않는다
+    // 그렇기에 목킹할 수 있는 빈을 등록
+    @MockBean
+    EventRepository eventRepository;
+
     @Test
     public void createEvent() throws Exception {
         Event event = Event.builder()
@@ -57,7 +64,11 @@ public class EventControllerTests {
                 .build();
         //이런 요청을 줘야하는데 본문에 주는 방법은
         // 아래에서 Json으로 바꿔주기로 했다
-        
+        event.setId(10);
+        //콜백느낌으로
+        //"eventRepository 에 save가 호출되면 , event변수를 리턴해라
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
+
         // perform 안에 있는 매개인자는 내가 확인하고 싶은 요청 넣으면 됨
         mockMvc.perform(post("/api/events/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)

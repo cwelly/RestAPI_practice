@@ -27,7 +27,10 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity createEvent(@RequestBody Event event){
-        URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
+        // 입력으로 받은 값이 DB에 저장하게 하는 코드
+        Event newEvent = this.eventRepository.save(event);
+
+        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         event.setId(10);
         return ResponseEntity.created(createdUri).body(event);
     }
