@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.JsonPath;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -19,8 +20,7 @@ import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 // junit5 로 오면서 @RunWith(SpringRunner.class)는 아래와 동일한 코드로 이름만 바뀜
@@ -80,7 +80,10 @@ public class EventControllerTests {
                 .andDo(print())
                 // 이렇게 하면 실행결과를 찍어보기가능
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists());
+                .andExpect(jsonPath("id").exists())
+                // "Location" 보다 타입 세이프 한 것.
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE));
 
     }
 
