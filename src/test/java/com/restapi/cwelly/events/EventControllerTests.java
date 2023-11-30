@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.JsonPath;
 import org.springframework.hateoas.MediaTypes;
@@ -29,8 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // 웹과 관련된 빈들이 모두 등록된다
 // 테스트에서 목관련된 빈들을 사용할수도 있다 아래와 같이
 // 목킹된 디스패처 서블릿을 상대로 가짜요청을 보내고 응답확인을 이 테스트안에서 할 수 있다.
-@WebMvcTest
+//@WebMvcTest
 
+@SpringBootTest
+// 위의 어노테이션에서 mock-mvc를 쓰려면 아래 어노테이션을 ㅆ어ㅑ함
+@AutoConfigureMockMvc
 //알아야 할건 이건 EventController의 단위테스트 라곤 보긴 어렵다
 // only EventController여야 단위테스트인데 지금은 목킹된 DS도 껴있기도 함
 public class EventControllerTests {
@@ -46,8 +51,8 @@ public class EventControllerTests {
 
     //위의 WebMvcTest만으로는 Repository 를 빈에 등록해주지 않는다
     // 그렇기에 목킹할 수 있는 빈을 등록
-    @MockBean
-    EventRepository eventRepository;
+//    @MockBean
+//    EventRepository eventRepository;
 
     @Test
     public void createEvent() throws Exception {
@@ -65,14 +70,20 @@ public class EventControllerTests {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .free(true)
+                .eventStatus(EventStatus.PUBLISHED)
                 .location("강남역 D2 스타텁 팩토리")
                 .build();
         //이런 요청을 줘야하는데 본문에 주는 방법은
         // 아래에서 Json으로 바꿔주기로 했다
-        event.setId(10);
+//        event.setId(10);
         //콜백느낌으로
         //"eventRepository 에 save가 호출되면 , event변수를 리턴해라
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
+//        Mockito.when(eventRepository.save(event)).thenReturn(event);
+        // 여기서 EventDto를 추가하고 나면 NullPointerException이 뜬다 , 왜?
+        // 위의 Mock 함수는 콜백함수 처럼 , eventRpository에서 save가 발생했을때 , 그 save의 인자가
+        // 이 테스트에서 새로만든 위의 event객체 일때 , 그렇다면(thenReturn) event 객체를 리턴하라는 의미다.
+        // 근데 save함수가 호출될때 , 인자로 받은 값이 아니라 인자의 값을 변형시켜 호출한값을 넣게 되도록 바뀌었기 때문에 리턴이 null이 된다.
+
 
         // perform 안에 있는 매개인자는 내가 확인하고 싶은 요청 넣으면 됨
         mockMvc.perform(post("/api/events/")
@@ -90,6 +101,7 @@ public class EventControllerTests {
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("eventStatus").value((EventStatus.DRAFT.name())))
                 .andExpect(jsonPath("free").value(Matchers.not(true)));
 
     }

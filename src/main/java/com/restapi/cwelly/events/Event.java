@@ -5,7 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import lombok.*;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
 
 
 // 자세한 구현 코드들은
@@ -29,8 +29,7 @@ import java.time.LocalDateTime;
 
 // 여기서 @Data  사용하면 안되는 이유는, 이미 Data와 겹치는 애노테이션읋 적용해뒀기 때문
 public class Event {
-    @Id
-    @GeneratedValue
+    @Id    @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -48,5 +47,5 @@ public class Event {
     // 순서를 우선시하는 ordinal은 나중에 enum의 순서가 바뀌면 데이터가
     // 꼬일 위험을 피하고자 String 사용
     @Enumerated(EnumType.STRING)
-    private EventStatus eventStatus;
+    private EventStatus eventStatus=EventStatus.DRAFT;
 }
