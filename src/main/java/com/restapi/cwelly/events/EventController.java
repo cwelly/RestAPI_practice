@@ -1,5 +1,6 @@
 package com.restapi.cwelly.events;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,16 +20,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class EventController {
 
     private final EventRepository eventRepository;
-    //A
+
+    private final ModelMapper modelMapper;
     // 받아올 파라미터가 이미 빈에 등록되어있다면 @Autowired생략 가능
-    public EventController(EventRepository eventRepository) {
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper) {
         this.eventRepository = eventRepository;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody Event event){
+    public ResponseEntity createEvent(@RequestBody EventDto eventDto){
         // 입력으로 받은 값이 DB에 저장하게 하는 코드
+        Event event = modelMapper.map(eventDto , Event.class);
         Event newEvent = this.eventRepository.save(event);
+        // 새로 EventDto를 만들었기 때문에 이를 사용하려면
+        // 원래라면 위의 EventDto의 값을 Event에 옮겨야 한다
+        //
 
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         event.setId(10);

@@ -2,6 +2,7 @@ package com.restapi.cwelly.events;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -51,6 +52,9 @@ public class EventControllerTests {
     @Test
     public void createEvent() throws Exception {
         Event event = Event.builder()
+                .id(100)
+                //이런 값이 들어오면 안된다.
+                // 알아서 계산되어야 하는 값들을 제한시켜줘야한다
                 .name("Spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,21))
@@ -60,6 +64,7 @@ public class EventControllerTests {
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
+                .free(true)
                 .location("강남역 D2 스타텁 팩토리")
                 .build();
         //이런 요청을 줘야하는데 본문에 주는 방법은
@@ -83,7 +88,9 @@ public class EventControllerTests {
                 .andExpect(jsonPath("id").exists())
                 // "Location" 보다 타입 세이프 한 것.
                 .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)));
 
     }
 
