@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+// 데이터를 입력 받을때 사용하는 DTO
 @Data @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class EventDto {

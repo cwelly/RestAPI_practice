@@ -56,10 +56,8 @@ public class EventControllerTests {
 
     @Test
     public void createEvent() throws Exception {
-        Event event = Event.builder()
-                .id(100)
-                //이런 값이 들어오면 안된다.
-                // 알아서 계산되어야 하는 값들을 제한시켜줘야한다
+        EventDto event = EventDto.builder()
+                // DTO로 민감한 값은 받지 않게 설정
                 .name("Spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,21))
@@ -69,8 +67,6 @@ public class EventControllerTests {
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
-                .free(true)
-                .eventStatus(EventStatus.PUBLISHED)
                 .location("강남역 D2 스타텁 팩토리")
                 .build();
         //이런 요청을 줘야하는데 본문에 주는 방법은
@@ -105,7 +101,46 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(Matchers.not(true)));
 
     }
+    @Test
+    public void createEvent_Bad_Request() throws Exception {
+        Event event = Event.builder()
+                .id(100)
+                //이런 값이 들어오면 안된다.
+                // 알아서 계산되어야 하는 값들을 제한시켜줘야한다
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,22))
+                .beginEventDateTime(LocalDateTime.of(2018,11,25,14,21))
+                .endEventDateTime(LocalDateTime.of(2018,11,26,14,21))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .free(true)
+                .eventStatus(EventStatus.PUBLISHED)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
 
+
+        // perform 안에 있는 매개인자는 내가 확인하고 싶은 요청 넣으면 됨
+        mockMvc.perform(post("/api/events/")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaTypes.HAL_JSON)
+                        // parameter로 줄 event 클래스를 Json형식으로 변환시키는 메소드
+                        .content(objectMapper.writeValueAsString(event))
+                )
+                // 이렇게 하면 실행결과를 찍어보기가능
+                .andDo(print())
+                // 이렇게 하면 실행결과를 찍어보기가능
+                .andExpect(status().isBadRequest())
+                // spring boot  의 기능을 이용해 application.properties에
+                // "spring.jackson.deserialization.fail-on-unknown-properties=true" 를 추가하여
+                // 스프링 부트 단에서 api를 통해 설정되지 않은 값 = dto에 없는 값이 들어올시 unknown 프로퍼티이므로 
+                // 이때 BAD_REQUEST를 리턴할 수 있게 만드는 라인
+                // 이때 사용한 것은 jackson 의 디시리얼레이션 혹은 시리얼레이션의 하나
+        ;
+
+    }
 
     
 }
